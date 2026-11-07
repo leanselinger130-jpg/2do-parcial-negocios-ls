@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocios Internacionales – 2do Parcial</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#fff; --text:#1c2333; --muted:#5b6478; --border:#dfe4ee;
+    --primary:#3b5bdb; --primary-soft:#e7ecff;
+    --ok:#1f9d55; --ok-bg:#e6f6ec; --bad:#d64545; --bad-bg:#fdeaea;
+    --shadow:0 2px 10px rgba(20,30,60,.07);
+    --warn:#8a6100; --warn-bg:#fff5da; --warn-bd:#e8c765;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#10141f; --card:#1a2030; --text:#e8ecf5; --muted:#9aa4bb; --border:#2b3350;
+      --primary:#7b93ff; --primary-soft:#232b4a;
+      --ok:#4cc38a; --ok-bg:#15301f; --bad:#ff7b7b; --bad-bg:#3a1c1f;
+      --shadow:none;
+      --warn:#e9c46a; --warn-bg:#3a2e10; --warn-bd:#6b5518;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+  header{padding:28px 16px 8px;text-align:center}
+  header h1{margin:0;font-size:clamp(1.3rem,4vw,1.9rem)}
+  header p{margin:4px 0 0;color:var(--muted);font-size:.95rem}
+  main{max-width:820px;margin:0 auto;padding:0 16px 48px}
+
+  .menu{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;
+    margin:16px 0;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+  .frow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .flabel{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;flex:0 0 74px}
+  .fbtn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:7px 14px;
+    border-radius:999px;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:.15s}
+  .fbtn:hover{border-color:var(--primary)}
+  .fbtn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+  .fbtn small{opacity:.75;font-weight:500;margin-left:4px}
+  .exambtn{width:100%;border:2px solid var(--primary);background:var(--primary-soft);color:var(--primary);
+    padding:12px 16px;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;transition:.15s}
+  .exambtn:hover{background:var(--primary);color:#fff}
+  .exambtn.active{background:var(--primary);color:#fff}
+  .menu.locked .practice{opacity:.45}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .score{font-weight:600;color:var(--muted)}
+  .score b{color:var(--text)}
+  .actions{display:flex;gap:8px}
+  .btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 14px;
+    border-radius:8px;font:inherit;cursor:pointer}
+  .btn:hover{border-color:var(--primary);color:var(--primary)}
+  .btn.main{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+  .btn.main:hover{color:#fff;opacity:.9}
+  .scope{font-size:.85rem;color:var(--muted);margin:0 0 10px}
+  .bar{height:6px;background:var(--border);border-radius:9px;overflow:hidden;margin-bottom:18px}
+  .bar i{display:block;height:100%;width:0;background:var(--primary);transition:width .3s}
+
+  .block-title{margin:26px 0 10px;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--primary);font-weight:700}
+  .q{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .q h3{margin:0 0 4px;font-size:1.02rem}
+  .tag{display:inline-block;font-size:.72rem;background:var(--primary-soft);color:var(--primary);
+    padding:2px 9px;border-radius:999px;margin-bottom:8px;font-weight:600}
+  .opts{display:grid;gap:10px;margin-top:12px}
+  .opt{display:flex;gap:12px;text-align:left;width:100%;border:2px solid var(--border);background:transparent;
+    color:var(--text);padding:12px 14px;border-radius:10px;font:inherit;cursor:pointer;transition:.15s}
+  .opt:hover:not(:disabled){border-color:var(--primary);background:var(--primary-soft)}
+  .opt .l{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--primary-soft);color:var(--primary);
+    display:grid;place-items:center;font-weight:700;font-size:.85rem}
+  .opt:disabled{cursor:default}
+  .opt.sel{border-color:var(--primary);background:var(--primary-soft)}
+  .opt.correct{border-color:var(--ok);background:var(--ok-bg)}
+  .opt.correct .l{background:var(--ok);color:#fff}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+  .opt.wrong .l{background:var(--bad);color:#fff}
+  .opt.dim{opacity:.85}
+  .opt .txt{display:block}
+  .optwhy{display:block;margin-top:5px;font-size:.86rem;color:var(--muted)}
+  .just .src{display:block;margin-top:8px;font-size:.78rem;color:var(--muted)}
+  .exam{display:inline-block;font-size:.72rem;font-weight:700;line-height:1.35;
+    padding:3px 10px;border-radius:999px;margin:0 0 8px 6px;
+    background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-bd)}
+  .just{margin-top:14px;padding:12px 14px;border-radius:10px;border-left:4px solid var(--ok);background:var(--ok-bg);font-size:.95rem}
+  .just.bad{border-color:var(--bad);background:var(--bad-bg)}
+  .just strong{display:block;margin-bottom:2px}
+  .result{display:none;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:var(--shadow)}
+  .result.show{display:block}
+  .result h2{margin:0 0 6px}
+  .empty{text-align:center;color:var(--muted);padding:40px 0}
+  .finish{text-align:center;margin:8px 0 24px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Negocios Internacionales</h1>
+  <p>2do parcial · práctica de preguntas multiple choice</p>
+</header>
+<main>
+  <div class="menu" id="menu"></div>
+  <div class="toolbar">
+    <div class="score">Respondidas <b id="answered">0</b>/<b id="total">0</b> · Correctas <b id="right">0</b></div>
+    <div class="actions"><button class="btn" id="reset">Reiniciar</button></div>
+  </div>
+  <div class="scope" id="scope"></div>
+  <div class="bar"><i id="progress"></i></div>
+  <div id="list"></div>
+  <div class="finish" id="finish"></div>
+  <div class="result" id="result"></div>
+</main>
+
+<!-- Una unidad nueva es otro bloque como este, con su JSON pegado tal cual. -->
+<script type="application/json" class="preguntas">[
+  {
+    "id": "U7-S01",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "¿Cuántas fases tiene la escuela de negociación competitiva (tradicional)?",
+    "opciones": {
+      "a": "4",
+      "b": "5",
+      "c": "6",
+      "d": "7",
+      "e": "8"
+    },
+    "correcta": "b",
+    "explicacion": "La escuela competitiva tiene 5 fases: Introducción, Tirar el ancla, Regateo y determinación del MANN o ALEX, Formas de llegar al acuerdo y Cierre.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: le falta una fase. Ninguna de las dos escuelas tiene 4.",
+      "b": "Correcta: son 5 fases.",
+      "c": "Incorrecta: 6 fases tiene la escuela colaborativa, no la competitiva. Es la confusión más típica.",
+      "d": "Incorrecta: ninguna escuela tiene 7 fases.",
+      "e": "Incorrecta: 8 son los principios para una negociación eficaz y los perfiles culturales, no las fases."
+    },
+    "fuente": "Filmina C7 p.4 · Punteo"
+  },
+  {
+    "id": "U7-S02",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "¿Con qué otro nombre se conoce a la escuela de negociación colaborativa?",
+    "opciones": {
+      "a": "Tradicional",
+      "b": "Competitiva",
+      "c": "Distributiva",
+      "d": "Integral",
+      "e": "Subordinada"
+    },
+    "correcta": "d",
+    "explicacion": "La filmina presenta dos escuelas: Competitiva – Tradicional y Colaborativa – Integral.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: «Tradicional» es el otro nombre de la escuela competitiva.",
+      "b": "Incorrecta: es la escuela opuesta.",
+      "c": "Incorrecta: el término no aparece en la filmina.",
+      "d": "Correcta: Colaborativa – Integral.",
+      "e": "Incorrecta: «subordinada» es un tipo de negociación (libro de París), no una escuela."
+    },
+    "fuente": "Filmina C7 p.4"
+  },
+  {
+    "id": "U7-S03",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "En la escuela competitiva, ¿qué significa la sigla MANN?",
+    "opciones": {
+      "a": "Máximo acuerdo no negociado",
+      "b": "Mejor alternativa no negociable",
+      "c": "Mejor alternativa no negociada",
+      "d": "Margen de acuerdo neto negociado",
+      "e": "Mínimo aceptable en negociación neutral"
+    },
+    "correcta": "c",
+    "explicacion": "MANN = mejor alternativa no negociada: tu mejor opción si no cerrás el trato. La filmina dice «no negociada».",
+    "justificacion_opciones": {
+      "a": "Incorrecta: no es un «máximo acuerdo», es una alternativa.",
+      "b": "Incorrecta y es la trampa: el resumen 2025 dice «no negociable», pero la filmina 2026 dice «no negociada». Para el parcial, «no negociada».",
+      "c": "Correcta: textual de la filmina.",
+      "d": "Incorrecta: confunde con el margen de negociación, que es otro concepto.",
+      "e": "Incorrecta: sigla inventada."
+    },
+    "fuente": "Filmina C7 p.5 · Resumen 2025"
+  },
+  {
+    "id": "U7-S04",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "En las culturas de bajo contexto, ¿qué es lo que más importa al negociar?",
+    "opciones": {
+      "a": "Las relaciones personales",
+      "b": "Las actitudes y la comunicación no verbal",
+      "c": "Los rituales previos",
+      "d": "La jerarquía de quienes negocian",
+      "e": "La palabra: la comunicación verbal"
+    },
+    "correcta": "e",
+    "explicacion": "Bajo contexto: importa la palabra (comunicación verbal), estilo directo y foco en el business.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: el foco en las relaciones es de alto contexto.",
+      "b": "Incorrecta: las actitudes y lo no verbal importan en alto contexto.",
+      "c": "Incorrecta: los rituales son una clave para negociar con culturas de alto contexto.",
+      "d": "Incorrecta: la filmina no define el contexto por la jerarquía.",
+      "e": "Correcta: textual del cuadro de la filmina."
+    },
+    "fuente": "Filmina C7 p.14 · Punteo"
+  },
+  {
+    "id": "U7-S05",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "Según la filmina, ¿cuál de estas culturas es de alto contexto?",
+    "opciones": {
+      "a": "Árabe",
+      "b": "Anglosajona",
+      "c": "Eslava",
+      "d": "Nórdica",
+      "e": "Norteamericana"
+    },
+    "correcta": "a",
+    "explicacion": "Alto contexto: latina, árabe, asiática y africana. Bajo contexto: anglosajona, eslava, nórdica y norteamericana.",
+    "justificacion_opciones": {
+      "a": "Correcta: la árabe es de alto contexto.",
+      "b": "Incorrecta: bajo contexto.",
+      "c": "Incorrecta: bajo contexto. Ojo, la eslava suele confundirse.",
+      "d": "Incorrecta: bajo contexto.",
+      "e": "Incorrecta: bajo contexto."
+    },
+    "fuente": "Filmina C7 p.14"
+  },
+  {
+    "id": "U7-S06",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "El «nemawashi», es decir, los acercamientos previos con niveles inferiores para aclarar los puntos centrales, es propio del negociador:",
+    "opciones": {
+      "a": "Chino",
+      "b": "Hindú",
+      "c": "Japonés",
+      "d": "Árabe",
+      "e": "De la gente del Pacífico (Australia)"
+    },
+    "correcta": "c",
+    "explicacion": "El nemawashi es japonés: cuando se sientan a negociar, todo está tan encaminado que es un acto armonioso, formal y protocolar.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: el chino se caracteriza por la paciencia, el autocontrol y la red de relaciones.",
+      "b": "Incorrecta: en el hindú los mandos medios son filtros de propuestas, pero no se habla de nemawashi.",
+      "c": "Correcta: rasgo textual del perfil japonés.",
+      "d": "Incorrecta: el árabe se caracteriza por la confianza, la palabra y el regateo.",
+      "e": "Incorrecta: el australiano es directo y rápido, lo opuesto al nemawashi."
+    },
+    "fuente": "Filmina C7 p.18"
+  },
+  {
+    "id": "U7-S07",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "¿Qué perfil negociador se caracteriza porque NO regatea?",
+    "opciones": {
+      "a": "Europeo mediterráneo",
+      "b": "Árabe",
+      "c": "Hindú",
+      "d": "Latinoamericano",
+      "e": "Europeo del Mar del Norte"
+    },
+    "correcta": "e",
+    "explicacion": "El europeo del Mar del Norte prioriza datos, información, metodología y costo-beneficio, y no regatea.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: en el mediterráneo el regateo es válido.",
+      "b": "Incorrecta: el árabe regatea hasta el último momento.",
+      "c": "Incorrecta: en el hindú el regateo es habitual.",
+      "d": "Incorrecta: el latinoamericano es un regateador amistoso e informal.",
+      "e": "Correcta: textual de la filmina."
+    },
+    "fuente": "Filmina C7 p.21"
+  },
+  {
+    "id": "U7-S08",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "¿Cuántos principios para una negociación eficaz presenta la filmina?",
+    "opciones": {
+      "a": "5",
+      "b": "6",
+      "c": "7",
+      "d": "8",
+      "e": "10"
+    },
+    "correcta": "d",
+    "explicacion": "Son 8 principios. No confundir con las 5 claves para una negociación eficaz.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: 5 son las claves, no los principios. Es la trampa.",
+      "b": "Incorrecta: 6 son las fases de la escuela colaborativa.",
+      "c": "Incorrecta: no corresponde a ninguna lista de la clase.",
+      "d": "Correcta: 8 principios.",
+      "e": "Incorrecta: no corresponde a ninguna lista de la clase."
+    },
+    "fuente": "Filmina C7 p.10-12"
+  },
+  {
+    "id": "U7-S09",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "¿Cuál es la primera fase de la escuela colaborativa?",
+    "opciones": {
+      "a": "Introducción",
+      "b": "Preparación previa",
+      "c": "Prenegociación",
+      "d": "Tirar el ancla",
+      "e": "Negociación propiamente dicha"
+    },
+    "correcta": "b",
+    "explicacion": "Fases colaborativas: I. Preparación previa, II. Prenegociación, III. Introducción, IV. Negociación propiamente dicha, V. Definición de valores y división del negocio, VI. Acuerdo final.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: es la tercera fase de la colaborativa (y la primera de la competitiva).",
+      "b": "Correcta: planificación y conocimiento.",
+      "c": "Incorrecta: es la segunda fase.",
+      "d": "Incorrecta: es una fase de la escuela competitiva.",
+      "e": "Incorrecta: es la cuarta fase."
+    },
+    "fuente": "Filmina C7 p.7"
+  },
+  {
+    "id": "U7-S10",
+    "unidad": 7,
+    "nivel": "sencillo",
+    "pregunta": "¿Cuál es la idea central de la escuela de negociación competitiva?",
+    "opciones": {
+      "a": "Las partes compiten para llevarse la mejor parte de la torta: uno gana y otro pierde",
+      "b": "Redefinir el problema para agrandar la torta antes de repartirla entre las partes",
+      "c": "Lograr un resultado ganar-ganar en el que ambas partes salgan beneficiadas",
+      "d": "Construir una relación comercial estable y de largo plazo entre las partes",
+      "e": "Decidir en base a criterios objetivos aunque las partes tengan prioridades distintas"
+    },
+    "correcta": "a",
+    "explicacion": "La competitiva es el «tire y afloje», el regateo: uno gana y otro pierde.",
+    "justificacion_opciones": {
+      "a": "Correcta: textual de la filmina.",
+      "b": "Incorrecta: agrandar la torta es la idea de la colaborativa.",
+      "c": "Incorrecta: ganar-ganar es colaborativa.",
+      "d": "Incorrecta: es uno de los fines de la negociación internacional según la cátedra; la competitiva sirve para relaciones de corto plazo.",
+      "e": "Incorrecta: los criterios objetivos identifican a la negociación razonada."
+    },
+    "fuente": "Filmina C7 p.4"
+  },
+  {
+    "id": "U7-I01",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "¿Cuál de las siguientes fases pertenece a la escuela competitiva?",
+    "opciones": {
+      "a": "Prenegociación",
+      "b": "Preparación previa",
+      "c": "Tirar el ancla",
+      "d": "Definición de valores y división del negocio",
+      "e": "Negociación propiamente dicha"
+    },
+    "correcta": "c",
+    "explicacion": "Tirar el ancla es la fase II de la competitiva. Las otras cuatro son fases de la colaborativa.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: fase II de la colaborativa.",
+      "b": "Incorrecta: fase I de la colaborativa.",
+      "c": "Correcta: fase II de la competitiva.",
+      "d": "Incorrecta: fase V de la colaborativa.",
+      "e": "Incorrecta: fase IV de la colaborativa."
+    },
+    "fuente": "Filmina C7 p.4-5"
+  },
+  {
+    "id": "U7-I02",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "En la escuela competitiva, el ALEX es:",
+    "opciones": {
+      "a": "La mejor alternativa no negociada",
+      "b": "La alternativa externa, punto de resistencia",
+      "c": "La distancia entre ambas aperturas",
+      "d": "La postura óptima de cada parte",
+      "e": "La zona donde se superponen los intervalos de ambas partes"
+    },
+    "correcta": "b",
+    "explicacion": "ALEX = alternativa externa, punto de resistencia. En criollo: tu límite dentro del trato.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: esa es la definición del MANN.",
+      "b": "Correcta: textual de la filmina.",
+      "c": "Incorrecta: la distancia entre aperturas define el rango de negociación (fase Tirar el ancla).",
+      "d": "Incorrecta: la postura óptima (PO) es el extremo favorable del intervalo de cada parte (París).",
+      "e": "Incorrecta: eso es el margen de maniobra."
+    },
+    "fuente": "Filmina C7 p.5"
+  },
+  {
+    "id": "U7-I03",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "¿Cuál de las siguientes es una crítica a la escuela COLABORATIVA?",
+    "opciones": {
+      "a": "Es extenuante y obliga a realizar ajustes y negociaciones nuevas",
+      "b": "El clima confrontativo lleva al resquebrajamiento de relaciones",
+      "c": "Se extiende mucho en tiempo y se llega al límite del último minuto",
+      "d": "Si se llega a un acuerdo no muy justo, quizás no se lleve a cabo, sobre todo si no es escrito",
+      "e": "No es aplicable para negocios de corto plazo"
+    },
+    "correcta": "e",
+    "explicacion": "La colaborativa requiere tiempo y conocimiento: por eso no aplica a negocios de corto plazo. Las otras cuatro son críticas a la competitiva.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: crítica a la competitiva.",
+      "b": "Incorrecta: crítica a la competitiva.",
+      "c": "Incorrecta: crítica a la competitiva.",
+      "d": "Incorrecta: crítica a la competitiva.",
+      "e": "Correcta: crítica a la colaborativa."
+    },
+    "fuente": "Filmina C7 p.6 y p.8"
+  },
+  {
+    "id": "U7-I04",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "¿Cuál de las siguientes es una de las 5 claves para una negociación eficaz?",
+    "opciones": {
+      "a": "Que exista independencia entre las partes",
+      "b": "Mantener intercambio exclusivo entre los máximos responsables",
+      "c": "Predisponerse para ganar la negociación",
+      "d": "Que exista interdependencia entre las partes",
+      "e": "Ser creativo para reducir el costo de lo que se negocia"
+    },
+    "correcta": "d",
+    "explicacion": "Las 5 claves: desarrollarla siguiendo etapas; mantener intercambio múltiple; que exista interdependencia; predisponerse para llegar a un acuerdo; ser creativo para aportar recursos que incrementen el valor de lo que se negocia.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: cambia «interdependencia» por «independencia».",
+      "b": "Incorrecta: la clave es un intercambio «múltiple» entre las partes.",
+      "c": "Incorrecta: es predisponerse para «llegar a un acuerdo», no para ganar.",
+      "d": "Correcta: textual de la filmina.",
+      "e": "Incorrecta: la creatividad es para «incrementar el valor», no para reducir el costo."
+    },
+    "fuente": "Filmina C7 p.9"
+  },
+  {
+    "id": "U7-I05",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "Que sea el cliente quien te llama a vos, y no al revés, es un ejemplo de qué fuente de poder:",
+    "opciones": {
+      "a": "Situacional",
+      "b": "Personal",
+      "c": "De la parte representada",
+      "d": "De obstrucción",
+      "e": "Del tiempo"
+    },
+    "correcta": "a",
+    "explicacion": "El poder situacional son las ventajas inherentes a la situación y al momento de la negociación. La filmina usa justo este ejemplo.",
+    "justificacion_opciones": {
+      "a": "Correcta: ejemplo textual de la filmina.",
+      "b": "Incorrecta: el poder personal es la experiencia, el conocimiento y las habilidades del negociador.",
+      "c": "Incorrecta: es la imagen y la posición competitiva de la organización que representa.",
+      "d": "Incorrecta: es la capacidad de bloquear o poner trabas.",
+      "e": "Incorrecta: el tiempo puede correr a favor o en contra, pero el ejemplo de quién llama a quién es situacional."
+    },
+    "fuente": "Filmina C7 p.10-11 · Punteo"
+  },
+  {
+    "id": "U7-I06",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "En la negociación con hindúes, ¿qué rol cumplen los mandos medios?",
+    "opciones": {
+      "a": "Toman las decisiones finales",
+      "b": "Hablan más que el jefe durante la reunión",
+      "c": "Realizan acercamientos previos para aclarar puntos centrales",
+      "d": "Firman los contratos en el idioma local",
+      "e": "Son filtros de propuestas: no toman decisiones"
+    },
+    "correcta": "e",
+    "explicacion": "En el perfil hindú se negocia en el más alto nivel; los mandos medios no deciden, filtran propuestas.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: las decisiones se toman en el más alto nivel.",
+      "b": "Incorrecta: «el jefe habla menos que los subalternos» es del perfil japonés.",
+      "c": "Incorrecta: eso es el nemawashi japonés.",
+      "d": "Incorrecta: los contratos se redactan en idioma local y en inglés, pero no es el rol de los mandos medios.",
+      "e": "Correcta: textual de la filmina."
+    },
+    "fuente": "Filmina C7 p.19"
+  },
+  {
+    "id": "U7-I07",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "¿Cuál de los siguientes es un rasgo del negociador latinoamericano?",
+    "opciones": {
+      "a": "Realiza mucha preparación y prenegociaciones",
+      "b": "No sacrifica el corto plazo para ganar en el largo plazo",
+      "c": "Es muy puntual, pero paciente con el otro",
+      "d": "Las decisiones se toman en los niveles más bajos",
+      "e": "Es preciso en sus términos y vago en los principios generales"
+    },
+    "correcta": "b",
+    "explicacion": "El latinoamericano busca satisfacción inmediata: no sacrifica el corto plazo por el largo plazo.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: es al revés, no realiza mucha preparación ni prenegociaciones.",
+      "b": "Correcta: textual de la filmina.",
+      "c": "Incorrecta: invertida. No es muy puntual, pero es impaciente con el otro.",
+      "d": "Incorrecta: las decisiones se toman en los niveles más altos.",
+      "e": "Incorrecta: invertida. Es vago en términos pero sólido en principios generales."
+    },
+    "fuente": "Filmina C7 p.23"
+  },
+  {
+    "id": "U7-I08",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "Según la escala de la filmina (de bajo a alto contexto), ¿cuál de estos grupos está más cerca del extremo de BAJO contexto?",
+    "opciones": {
+      "a": "Norteamericanos",
+      "b": "Ingleses",
+      "c": "Escandinavos",
+      "d": "Suizos",
+      "e": "Franceses"
+    },
+    "correcta": "d",
+    "explicacion": "Escala: Suizos, Alemanes, Escandinavos, Norteamericanos, Ingleses, Franceses, Italianos/Españoles, Latinoamericanos, Árabes, Japoneses.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: son de bajo contexto, pero están en el cuarto lugar. Ojo: para Meyer EE. UU. es el más bajo del mundo; para el parcial, seguí la filmina.",
+      "b": "Incorrecta: quinto lugar.",
+      "c": "Incorrecta: tercer lugar.",
+      "d": "Correcta: los suizos encabezan la escala.",
+      "e": "Incorrecta: sexto lugar, ya hacia el centro."
+    },
+    "fuente": "Filmina C7 p.15 · Libro: Meyer, cap. 1"
+  },
+  {
+    "id": "U7-I09",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "¿Qué perfil negociador firma contratos escritos que comúnmente se modifican en la práctica?",
+    "opciones": {
+      "a": "Hindú",
+      "b": "Angloamericano",
+      "c": "Gente del Pacífico (Australia)",
+      "d": "Árabe",
+      "e": "Japonés"
+    },
+    "correcta": "a",
+    "explicacion": "Hindú: contratos escritos que se modifican en la práctica, redactados en idioma local y en inglés.",
+    "justificacion_opciones": {
+      "a": "Correcta: textual de la filmina.",
+      "b": "Incorrecta: los angloamericanos plasman acuerdos en contratos muy detallados.",
+      "c": "Incorrecta: en Australia hay que especificar todos los detalles y cumplir todo lo negociado.",
+      "d": "Incorrecta: los árabes usan menos documentos legales y dan importancia a «la palabra».",
+      "e": "Incorrecta: con japoneses hay que cumplir la palabra de lo prometido."
+    },
+    "fuente": "Filmina C7 p.19"
+  },
+  {
+    "id": "U7-I10",
+    "unidad": 7,
+    "nivel": "intermedio",
+    "pregunta": "En la escuela competitiva, ¿dónde se busca cerrar el acuerdo?",
+    "opciones": {
+      "a": "En el punto medio entre ambas aperturas",
+      "b": "En la postura óptima de la otra parte",
+      "c": "Próximo al ALEX o MANN",
+      "d": "Una vez definidos los valores y la división del negocio",
+      "e": "Sin formalizarlo por escrito"
+    },
+    "correcta": "c",
+    "explicacion": "Fase V de la competitiva: cierre del acuerdo, próximo al ALEX o MANN.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: la filmina no habla de un punto medio.",
+      "b": "Incorrecta: concepto de París (margen de negociación), no de las fases.",
+      "c": "Correcta: textual de la filmina.",
+      "d": "Incorrecta: es la fase V de la colaborativa.",
+      "e": "Incorrecta: que muchas veces no se formalice por escrito es del acuerdo final colaborativo."
+    },
+    "fuente": "Filmina C7 p.5"
+  },
+  {
+    "id": "U7-D01",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "La afirmación «no es forzado y muchas veces no se formaliza en forma escrita» corresponde a:",
+    "opciones": {
+      "a": "Una crítica a la escuela competitiva",
+      "b": "La fase de cierre del acuerdo de la escuela competitiva",
+      "c": "La fase de acuerdo final de la escuela colaborativa",
+      "d": "Una crítica a la escuela colaborativa",
+      "e": "La fase de formas de llegar al acuerdo de la escuela competitiva"
+    },
+    "correcta": "c",
+    "explicacion": "Es la fase VI de la colaborativa. La trampa: la crítica a la competitiva también menciona lo escrito («si no es escrito, quizás no se lleve a cabo»).",
+    "justificacion_opciones": {
+      "a": "Incorrecta: la crítica a la competitiva dice que un acuerdo injusto quizás no se lleve a cabo si no es escrito. Es otra idea.",
+      "b": "Incorrecta: el cierre competitivo es próximo al ALEX o MANN.",
+      "c": "Correcta: acuerdo final colaborativo.",
+      "d": "Incorrecta: ninguna crítica a la colaborativa habla de la forma escrita.",
+      "e": "Incorrecta: esa fase se refiere a las formas dura y suave."
+    },
+    "fuente": "Filmina C7 p.6-7 · Marca ⚑ del doc"
+  },
+  {
+    "id": "U7-D02",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "¿Cuál de las siguientes NO es una crítica a la escuela competitiva?",
+    "opciones": {
+      "a": "No se puede tener más de un aliado estratégico",
+      "b": "No siempre llega al acuerdo; es útil para negociaciones puntuales y de corto plazo",
+      "c": "El clima confrontativo lleva al resquebrajamiento de relaciones",
+      "d": "Es extenuante y obliga a realizar ajustes y negociaciones nuevas",
+      "e": "Se extiende mucho en tiempo y se llega al límite del último minuto"
+    },
+    "correcta": "a",
+    "explicacion": "«No se puede tener más de un aliado estratégico» es una crítica a la colaborativa. Las otras cuatro son críticas a la competitiva.",
+    "justificacion_opciones": {
+      "a": "Correcta (es la que NO es): crítica a la colaborativa.",
+      "b": "Incorrecta: es la crítica 5 a la competitiva.",
+      "c": "Incorrecta: es la crítica 4 a la competitiva.",
+      "d": "Incorrecta: es la crítica 2 a la competitiva.",
+      "e": "Incorrecta: es la crítica 3 a la competitiva."
+    },
+    "fuente": "Filmina C7 p.6 y p.8"
+  },
+  {
+    "id": "U7-D03",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "¿Cuál de los siguientes NO forma parte del principio «Plantear el caso en forma ventajosa»?",
+    "opciones": {
+      "a": "No asumir que hay una única realidad: esperarse lo inesperado",
+      "b": "Relacionarlo con algo que la otra parte ya comprenda",
+      "c": "Agudizar el lenguaje y usar metáforas",
+      "d": "No enmarcar el tema en el vacío: armar una lista de opciones",
+      "e": "Compartir información para generar confianza y reducir incertidumbre"
+    },
+    "correcta": "e",
+    "explicacion": "Compartir información es parte del principio 6, «Administrar la información hábilmente». Las otras cuatro son subítems del principio 3.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: es subítem del principio 3 (y se tomó en el recuperatorio 2025).",
+      "b": "Incorrecta: es subítem del principio 3.",
+      "c": "Incorrecta: es subítem del principio 3.",
+      "d": "Incorrecta: es subítem del principio 3.",
+      "e": "Correcta (es la que NO es): pertenece al principio 6."
+    },
+    "fuente": "Filmina C7 p.10-12"
+  },
+  {
+    "id": "U7-D04",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "En la escuela competitiva, la fase «Tirar el ancla» consiste en abrir:",
+    "opciones": {
+      "a": "Lo más cerca posible del interés mínimo o de necesidad básica, y la distancia entre ambas aperturas define el margen de maniobra",
+      "b": "Lo más lejos posible del interés máximo o de necesidad básica, y la distancia entre ambas aperturas define el punto de ruptura",
+      "c": "Con los intereses comunes detectados en la prenegociación, y la distancia entre ambas aperturas define el rango de negociación",
+      "d": "Lo más lejos posible del interés mínimo o de necesidad básica, y la distancia entre ambas aperturas define el rango de negociación",
+      "e": "Lo más lejos posible del interés mínimo o de necesidad básica, y la distancia entre ambas aperturas define el MANN de la otra parte"
+    },
+    "correcta": "d",
+    "explicacion": "Textual: tirar el ancla lo más lejos que se pueda del interés mínimo o de necesidad básica; la distancia entre ambas aperturas define el rango de negociación.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: dice «cerca» en vez de «lejos» y «margen de maniobra» en vez de «rango de negociación».",
+      "b": "Incorrecta: cambia «mínimo» por «máximo» y «rango» por «punto de ruptura».",
+      "c": "Incorrecta: iniciar con intereses comunes es la Introducción colaborativa.",
+      "d": "Correcta: textual de la filmina.",
+      "e": "Incorrecta: el MANN se determina en la fase de regateo, no por la distancia entre aperturas."
+    },
+    "fuente": "Filmina C7 p.5"
+  },
+  {
+    "id": "U7-D05",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "Una exportadora argentina se prepara para negociar. Le advierten que sus contrapartes valoran la puntualidad, que no hay que hacer alarde de títulos ni cargos, que conviene hacer propuestas cortas y claras («si cierra, bien; si no, a otra cosa») y que en el contrato hay que especificar todos los detalles. ¿Con qué perfil va a negociar?",
+    "opciones": {
+      "a": "Angloamericano",
+      "b": "Gente del Pacífico (Australia)",
+      "c": "Europeo del Mar del Norte",
+      "d": "Japonés",
+      "e": "Chino"
+    },
+    "correcta": "b",
+    "explicacion": "Puntualidad, igualdad sin alarde de títulos, propuestas cortas y claras y contratos detallados: todo es del perfil australiano.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: también son directos y usan contratos detallados, pero respetan la jerarquía (no encaja con «no hacer alarde de cargos») y la filmina no menciona la puntualidad.",
+      "b": "Correcta: todos los rasgos son textuales del perfil del Pacífico.",
+      "c": "Incorrecta: priorizan datos y metodología, pero nada de puntualidad ni de propuestas cortas.",
+      "d": "Incorrecta: los japoneses piden información detallada y preguntan mucho; el proceso es lento y protocolar.",
+      "e": "Incorrecta: el chino es paciente; lo importante es llegar al resultado sin importar el tiempo."
+    },
+    "fuente": "Filmina C7 p.22 y p.16"
+  },
+  {
+    "id": "U7-D06",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "¿A qué perfil corresponde textualmente el rasgo «más emocionales: estallidos emocionales para intimidar o desacomodar»?",
+    "opciones": {
+      "a": "Árabe",
+      "b": "Latinoamericano",
+      "c": "Hindú",
+      "d": "Europeo del Mar del Norte",
+      "e": "Europeo mediterráneo"
+    },
+    "correcta": "e",
+    "explicacion": "Los estallidos emocionales para intimidar o desacomodar son del europeo mediterráneo. Árabe y latinoamericano también usan las emociones, pero con otras palabras.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: en el árabe «juegan las emociones, los sentimientos y la relación personal». No habla de estallidos.",
+      "b": "Incorrecta: el latinoamericano «manipula emociones y juegos de poder». Parecido, pero no es el texto.",
+      "c": "Incorrecta: el hindú es lo opuesto: comportamiento reservado y emociones controladas.",
+      "d": "Incorrecta: el Mar del Norte prioriza datos y metodología; no es emocional.",
+      "e": "Correcta: textual del perfil mediterráneo."
+    },
+    "fuente": "Filmina C7 p.21, p.20 y p.23"
+  },
+  {
+    "id": "U7-D07",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "¿Cuál de las siguientes NO es una fuente de poder según la filmina?",
+    "opciones": {
+      "a": "Personal",
+      "b": "De la parte representada",
+      "c": "De obstrucción",
+      "d": "De la información",
+      "e": "Del tiempo"
+    },
+    "correcta": "d",
+    "explicacion": "Las 5 fuentes de poder: personal, de la parte representada, situacional, de obstrucción y del tiempo. La información aparece como principio 6 («Administrar la información hábilmente»), no como fuente de poder.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: es fuente de poder (experiencia, conocimiento y habilidades).",
+      "b": "Incorrecta: es fuente de poder (imagen y posición competitiva de la organización).",
+      "c": "Incorrecta: es fuente de poder (capacidad de bloquear o poner trabas).",
+      "d": "Correcta (es la que NO es): la información es otro principio.",
+      "e": "Incorrecta: es fuente de poder (puede correr a favor o en contra)."
+    },
+    "fuente": "Filmina C7 p.10-12"
+  },
+  {
+    "id": "U7-D08",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "¿Cuál de las siguientes afirmaciones sobre el negociador angloamericano es correcta?",
+    "opciones": {
+      "a": "Prefieren un clima informal, pero no personalizan la relación ni el contenido de las conversaciones",
+      "b": "Prefieren negociar todos los puntos juntos y no punto por punto, para ver el acuerdo completo",
+      "c": "Los acuerdos se basan en la palabra dicha, que vale como acuerdo de caballeros, sin contratos detallados",
+      "d": "No respetan la jerarquía: cualquier miembro del equipo puede tomar las decisiones finales",
+      "e": "Evitan presionar con ultimátums para no dañar la relación personal con la otra parte"
+    },
+    "correcta": "a",
+    "explicacion": "Textual de la filmina: clima informal, pero sin personalizar la relación ni el contenido de las conversaciones.",
+    "justificacion_opciones": {
+      "a": "Correcta: textual de la filmina.",
+      "b": "Incorrecta: invertida. Prefieren negociar punto por punto y no todo junto.",
+      "c": "Incorrecta: plasman los acuerdos en contratos muy detallados. La palabra es del árabe y del mediterráneo.",
+      "d": "Incorrecta: respetan la jerarquía en la toma de decisiones.",
+      "e": "Incorrecta: les gusta presionar con «tómalo o déjalo»."
+    },
+    "fuente": "Filmina C7 p.16"
+  },
+  {
+    "id": "U7-D09",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "¿Cuál de los siguientes rasgos corresponde al negociador CHINO?",
+    "opciones": {
+      "a": "Llegan a las reuniones en grupo",
+      "b": "Evitar decir no",
+      "c": "El jefe habla menos que los subalternos",
+      "d": "No poner muchas alternativas en la negociación",
+      "e": "Suelen demostrar superioridad"
+    },
+    "correcta": "b",
+    "explicacion": "«Evitar decir no» es del perfil chino. Meyer explica que en Asia el «no» se dice entre líneas.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: es japonés. El chino «prioriza los objetivos del grupo»; no confundir.",
+      "b": "Correcta: textual del perfil chino.",
+      "c": "Incorrecta: es japonés.",
+      "d": "Incorrecta: es japonés.",
+      "e": "Incorrecta: es hindú."
+    },
+    "fuente": "Filmina C7 p.17-19 · Libro: Meyer, cap. 1"
+  },
+  {
+    "id": "U7-D10",
+    "unidad": 7,
+    "nivel": "dificil",
+    "pregunta": "Una empresa va a negociar con una contraparte de cultura de ALTO contexto. Según la filmina, ¿qué le conviene hacer?",
+    "opciones": {
+      "a": "Ser transparente, claro y directo, con foco en el business y no en la relación personal",
+      "b": "Priorizar la comunicación verbal por sobre las actitudes, dejando todo explícito en la propuesta",
+      "c": "Construir relación personal, encontrar similitudes y presentar propuestas flexibles analizando reacciones",
+      "d": "Ir al grano, negociar punto por punto y cerrar rápido con un contrato muy detallado",
+      "e": "Evitar los rituales y las conversaciones informales para no perder tiempo en la reunión"
+    },
+    "correcta": "c",
+    "explicacion": "Claves para alto contexto: relación personal, encontrar similitudes, rituales, ser reservados, propuestas flexibles y analizar reacciones.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: transparencia, claridad y ser directo son las claves para bajo contexto.",
+      "b": "Incorrecta: en alto contexto importan las actitudes (lo no verbal).",
+      "c": "Correcta: textual del cuadro de la filmina.",
+      "d": "Incorrecta: es el estilo angloamericano, de bajo contexto.",
+      "e": "Incorrecta: los rituales son justamente una clave en alto contexto."
+    },
+    "fuente": "Filmina C7 p.14"
+  },
+  {
+    "id": "U7-P01",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Dos empresas negocian un contrato y cada una adopta una postura ganador/perdedor: lo que gana una lo pierde la otra. ¿Qué tipo de negociación es?",
+    "opciones": {
+      "a": "Razonada",
+      "b": "De confrontación",
+      "c": "Subordinada",
+      "d": "Colaborativa",
+      "e": "Con inacción"
+    },
+    "correcta": "b",
+    "explicacion": "La postura ganador/perdedor identifica a la negociación de confrontación (choque, ganar-perder).",
+    "justificacion_opciones": {
+      "a": "Incorrecta: la razonada busca un acuerdo con criterios objetivos.",
+      "b": "Correcta: postura ganador/perdedor.",
+      "c": "Incorrecta: en la subordinada una parte tiene fuerza y la otra cede por urgencia.",
+      "d": "Incorrecta: la colaborativa busca beneficio mutuo.",
+      "e": "Incorrecta: en la inacción no se negocia. En los parciales aparece solo como distractor."
+    },
+    "fuente": "Parcial · Libro: París (vía parciales) · Resumen 2025",
+    "origen_parcial": "2º parcial 2024, Tema 1, P3",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P02",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Una empresa necesita con urgencia unos componentes para su producción. El único proveedor disponible tiene una posición de fuerza y fija precios altos, y la empresa termina aceptando sus condiciones. ¿Qué tipo de negociación es?",
+    "opciones": {
+      "a": "Colaborativa",
+      "b": "Razonada",
+      "c": "De confrontación",
+      "d": "Con inacción",
+      "e": "Subordinada"
+    },
+    "correcta": "e",
+    "explicacion": "Subordinada: una parte tiene posición de fuerza y la otra necesita el acuerdo con urgencia, entonces cede (uno manda y el otro cede).",
+    "justificacion_opciones": {
+      "a": "Incorrecta: no hay beneficio mutuo ni intercambio de información.",
+      "b": "Incorrecta: no se decide por criterios objetivos, sino por la fuerza de una parte.",
+      "c": "Incorrecta: no hay choque; una parte cede.",
+      "d": "Incorrecta: sí hay negociación.",
+      "e": "Correcta: fuerza de un lado, urgencia del otro."
+    },
+    "fuente": "Parcial · Libro: París (vía parciales)",
+    "origen_parcial": "2º parcial 2024, Tema 3, P3",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P03",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Dos empresas con intereses similares negocian un acuerdo de distribución e intercambian información para encontrar una solución de beneficio mutuo. ¿Qué tipo de negociación es?",
+    "opciones": {
+      "a": "Colaborativa",
+      "b": "Razonada",
+      "c": "Subordinada",
+      "d": "De confrontación",
+      "e": "Con inacción"
+    },
+    "correcta": "a",
+    "explicacion": "Intereses similares + intercambio de información + beneficio mutuo = colaborativa.",
+    "justificacion_opciones": {
+      "a": "Correcta: «intereses similares» y «beneficio mutuo» son las palabras clave.",
+      "b": "Incorrecta: la razonada parte de prioridades distintas y usa criterios objetivos.",
+      "c": "Incorrecta: no hay una parte que imponga su fuerza.",
+      "d": "Incorrecta: no hay postura ganador/perdedor.",
+      "e": "Incorrecta: sí hay negociación."
+    },
+    "fuente": "Parcial · Libro: París (vía parciales)",
+    "origen_parcial": "2º parcial 2024, Tema 4, P2",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P04",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Una farmacéutica argentina y la Universidad de Chile negocian un convenio. Tienen prioridades distintas, pero buscan un acuerdo basado en criterios objetivos. ¿Qué tipo de negociación es?",
+    "opciones": {
+      "a": "Colaborativa",
+      "b": "De confrontación",
+      "c": "Razonada",
+      "d": "Subordinada",
+      "e": "Con inacción"
+    },
+    "correcta": "c",
+    "explicacion": "Prioridades distintas + criterios objetivos = razonada.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: es el distractor fuerte. La colaborativa parte de intereses similares; acá las prioridades son distintas.",
+      "b": "Incorrecta: no hay postura ganador/perdedor.",
+      "c": "Correcta: la palabra clave es «criterios objetivos».",
+      "d": "Incorrecta: ninguna parte impone fuerza ni cede por urgencia.",
+      "e": "Incorrecta: sí hay negociación."
+    },
+    "fuente": "Parcial · Libro: París (vía parciales)",
+    "origen_parcial": "2º parcial 2024, Tema 2, P2",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P05",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "La negociación internacional es:",
+    "opciones": {
+      "a": "Un proceso para gestionar las personas, basado en el diálogo y habilidades para lograr ciertos objetivos o fines entre agentes de distintos países",
+      "b": "Un proceso para gestionar los productos, basado en el diálogo y habilidades para lograr ciertos objetivos o fines entre agentes de distintos países",
+      "c": "Un proceso para gestionar las relaciones, basado en el diálogo y habilidades para lograr ciertos objetivos o fines entre agentes de un mismo país",
+      "d": "Un proceso para gestionar las relaciones, basado en el diálogo y habilidades para lograr ciertos objetivos o fines entre agentes de distintos países",
+      "e": "Un proceso para gestionar las relaciones entre gobiernos, con el fin de concretar importaciones"
+    },
+    "correcta": "d",
+    "explicacion": "Definición textual de la cátedra: proceso para gestionar las RELACIONES, basado en el DIÁLOGO y habilidades, entre agentes de DISTINTOS PAÍSES.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: cambia «relaciones» por «personas».",
+      "b": "Incorrecta: cambia «relaciones» por «productos».",
+      "c": "Incorrecta: cambia «distintos países» por «un mismo país».",
+      "d": "Correcta: definición textual.",
+      "e": "Incorrecta: dos trampas que ya aparecieron: «entre gobiernos» solo (es entre privados o con algunos gobiernos) y «concretar importaciones»."
+    },
+    "fuente": "Parcial · Resumen 2025",
+    "origen_parcial": "2º parcial 2024, Tema 2, P7 · 2º parcial 2025, Tema 1, P9",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P06",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Existen varios tipos de negociación. ¿Cuál es la que le interesa al comercio internacional?",
+    "opciones": {
+      "a": "De tipo cualitativo",
+      "b": "De tipo cuantitativo",
+      "c": "De tipo racional",
+      "d": "De tipo local",
+      "e": "De tipo económico"
+    },
+    "correcta": "e",
+    "explicacion": "Al comercio internacional le interesa la negociación de tipo económico: se da en cualquier transacción de compra-venta entre privados o con algunos gobiernos.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: no es una categoría que use la cátedra.",
+      "b": "Incorrecta: no es una categoría que use la cátedra.",
+      "c": "Incorrecta: suena parecido a «razonada», pero no es lo que pregunta.",
+      "d": "Incorrecta: contradice el carácter internacional.",
+      "e": "Correcta: punto 2 de los 4 que dio la cátedra. El parcial no traía la respuesta marcada; se resolvió con el resumen 2025."
+    },
+    "fuente": "Parcial · Resumen 2025",
+    "origen_parcial": "2º parcial 2025, P7",
+    "opciones_originales": true
+  },
+  {
+    "id": "U7-P07",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Respecto del margen de negociación, señale la opción FALSA:",
+    "opciones": {
+      "a": "Es la flexibilidad o capacidad que tienen las partes para discutir y modificar los términos de un contrato",
+      "b": "Cada parte negocia en el intervalo que va desde su postura óptima hasta su punto de ruptura",
+      "c": "El margen es estático en el tiempo para cada parte",
+      "d": "El contexto sociocultural puede generar tendencias en el margen de negociación",
+      "e": "Un margen flexible implica que las partes tienen muchas opciones"
+    },
+    "correcta": "c",
+    "explicacion": "Lo falso es que el margen sea estático: no lo es. Las otras cuatro son afirmaciones correctas.",
+    "justificacion_opciones": {
+      "a": "Verdadera: es la definición de margen de negociación.",
+      "b": "Verdadera: el intervalo va de la PO al PR.",
+      "c": "FALSA, por eso es la respuesta: el margen no es estático.",
+      "d": "Verdadera: el contexto sociocultural genera tendencias.",
+      "e": "Verdadera: margen flexible = muchas opciones."
+    },
+    "fuente": "Parcial · Libro: París cap. 6 (vía parciales)",
+    "origen_parcial": "2º parcial 2024, Tema 3, P4",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P08",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Un importador tiene una postura óptima de 1000 USD y un punto de ruptura de 300 USD. Un exportador tiene una postura óptima de 1200 USD y un punto de ruptura de 550 USD. ¿Cuál es el margen de maniobra?",
+    "opciones": {
+      "a": "De 300 a 1200 USD",
+      "b": "De 300 a 550 USD",
+      "c": "De 550 a 1200 USD",
+      "d": "De 1000 a 1200 USD",
+      "e": "De 550 a 1000 USD"
+    },
+    "correcta": "e",
+    "explicacion": "El margen de maniobra es la zona donde se superponen los intervalos. Importador: [300; 1000]. Exportador: [550; 1200]. Superposición: [550; 1000]. Nota: los valores del importador están tal cual figuran en el parcial. En la práctica, un importador quiere pagar lo menos posible, así que su postura óptima sería el valor bajo; igual, la superposición da lo mismo.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: es la unión de ambos intervalos, no la superposición.",
+      "b": "Incorrecta: por debajo de 550 el exportador no vende (es su punto de ruptura).",
+      "c": "Incorrecta: es el intervalo del exportador completo.",
+      "d": "Incorrecta: queda fuera del intervalo del importador, que termina en 1000.",
+      "e": "Correcta: superposición de [300; 1000] y [550; 1200]."
+    },
+    "fuente": "Parcial · Libro: París cap. 6 (vía parciales)",
+    "origen_parcial": "2º parcial 2024, Tema 4, P3",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P09",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "«No asumir que hay una única realidad» forma parte del principio para una negociación eficaz:",
+    "opciones": {
+      "a": "Satisfacer necesidades más que los deseos",
+      "b": "Plantear el caso en forma ventajosa",
+      "c": "Conocer el alcance y la fuerza de cada parte",
+      "d": "Desarrollar opciones y una estrategia de concesiones",
+      "e": "Administrar la información hábilmente"
+    },
+    "correcta": "b",
+    "explicacion": "Es un subítem del principio 3, «Plantear el caso en forma ventajosa». En el parcial, los distractores eran los principios 1, 2, 5 y 6.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: principio 1 (identificar intereses comunes, escucha activa).",
+      "b": "Correcta: principio 3.",
+      "c": "Incorrecta: principio 2 (poder y sus fuentes).",
+      "d": "Incorrecta: principio 5 (cada negociación es única, concesiones creativas).",
+      "e": "Incorrecta: principio 6 (compartir información genera confianza)."
+    },
+    "fuente": "Parcial · Filmina C7 p.10-12",
+    "origen_parcial": "Recuperatorio 2º parcial 2025, P7",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P10",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "¿Cuál de los siguientes países es de bajo contexto?",
+    "opciones": {
+      "a": "China",
+      "b": "Colombia",
+      "c": "Suecia",
+      "d": "India",
+      "e": "Egipto"
+    },
+    "correcta": "c",
+    "explicacion": "Suecia es escandinava (nórdica): bajo contexto. Los demás son asiáticos, latinos o árabes/africanos: alto contexto.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: asiático, alto contexto.",
+      "b": "Incorrecta: latino, alto contexto.",
+      "c": "Correcta: nórdico, bajo contexto.",
+      "d": "Incorrecta: asiático, alto contexto.",
+      "e": "Incorrecta: árabe y africano, alto contexto."
+    },
+    "fuente": "Parcial · Filmina C7 p.14-15",
+    "origen_parcial": "Recuperatorio 2º parcial 2025, P5",
+    "opciones_originales": true
+  },
+  {
+    "id": "U7-P11",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Si una empresa negocia con una cultura de ALTO contexto, ¿con qué país estaría negociando?",
+    "opciones": {
+      "a": "Suiza",
+      "b": "Alemania",
+      "c": "Estados Unidos",
+      "d": "Japón",
+      "e": "Suecia"
+    },
+    "correcta": "d",
+    "explicacion": "Japón es el de contexto más alto de la escala de la filmina (y también para Meyer). Los otros cuatro son de bajo contexto.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: el extremo de bajo contexto de la escala.",
+      "b": "Incorrecta: segundo en la escala de bajo contexto.",
+      "c": "Incorrecta: norteamericano, bajo contexto (para Meyer, el más bajo del mundo).",
+      "d": "Correcta: extremo de alto contexto.",
+      "e": "Incorrecta: escandinavo, bajo contexto."
+    },
+    "fuente": "Parcial · Resumen 2025 · Filmina C7 p.14-15",
+    "origen_parcial": "2º parcial 2025, Tema 1, P10",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P12",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "¿Cuál es una característica del negociador italiano?",
+    "opciones": {
+      "a": "Trabaja en equipo y tiene sentido de identidad de grupo; prioriza datos e información",
+      "b": "Prioriza datos, información y metodología; el costo-beneficio es su principal prioridad",
+      "c": "Actúa más independiente, buscando magnificar el beneficio de su organización y no el bien común",
+      "d": "No regatea: presenta una propuesta y espera que la otra parte la acepte o la rechace",
+      "e": "Tiene un comportamiento reservado, emociones controladas y negocia en un ambiente formal"
+    },
+    "correcta": "c",
+    "explicacion": "Italia es europeo mediterráneo: más individualista, actúa independiente buscando magnificar el beneficio de su organización y no el bien común.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: es del europeo del Mar del Norte.",
+      "b": "Incorrecta: es del europeo del Mar del Norte.",
+      "c": "Correcta: textual del perfil mediterráneo.",
+      "d": "Incorrecta: es del Mar del Norte. En el mediterráneo el regateo es válido.",
+      "e": "Incorrecta: es del hindú (reservado, emociones controladas, ambiente formal). El mediterráneo es emocional."
+    },
+    "fuente": "Parcial · Resumen 2025 · Filmina C7 p.21",
+    "origen_parcial": "2º parcial 2025, Tema 1, P5",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P13",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "¿Cuál es una característica del negociador australiano?",
+    "opciones": {
+      "a": "Actúa más independiente buscando magnificar el beneficio de su organización",
+      "b": "Le gusta negociar por fuera de la mesa de negociación",
+      "c": "Comportamiento reservado y emociones controladas",
+      "d": "Se debe cumplir todo lo negociado; si no, se le cierran las puertas",
+      "e": "Llegan a las reuniones en grupo"
+    },
+    "correcta": "d",
+    "explicacion": "Rasgo textual del perfil de la gente del Pacífico (Australia). Los cuatro distractores son rasgos textuales de otros perfiles.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: europeo mediterráneo.",
+      "b": "Incorrecta: latinoamericano.",
+      "c": "Incorrecta: hindú.",
+      "d": "Correcta: australiano.",
+      "e": "Incorrecta: japonés."
+    },
+    "fuente": "Parcial · Filmina C7 p.16-23",
+    "origen_parcial": "2º parcial 2025, P2",
+    "opciones_originales": true
+  },
+  {
+    "id": "U7-P14",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "¿Cuál es una característica del negociador chileno?",
+    "opciones": {
+      "a": "Le gusta negociar por fuera de la mesa de negociación",
+      "b": "Prefiere negociar punto por punto y no todo junto",
+      "c": "Realiza mucha preparación y prenegociaciones",
+      "d": "Llega a las reuniones en grupo y el jefe habla menos",
+      "e": "No regatea; prioriza el costo-beneficio"
+    },
+    "correcta": "a",
+    "explicacion": "Chile es latinoamericano: le gusta negociar por fuera de la mesa de negociación.",
+    "justificacion_opciones": {
+      "a": "Correcta: rasgo textual del latinoamericano.",
+      "b": "Incorrecta: angloamericano.",
+      "c": "Incorrecta: invertida. El latinoamericano NO realiza mucha preparación ni prenegociaciones.",
+      "d": "Incorrecta: japonés.",
+      "e": "Incorrecta: europeo del Mar del Norte."
+    },
+    "fuente": "Parcial · Filmina C7 p.23",
+    "origen_parcial": "2º parcial 27/11/2025, Tema 3, P2",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P15",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "¿Cuál de las siguientes fases NO pertenece a la escuela competitiva?",
+    "opciones": {
+      "a": "Introducción",
+      "b": "Tirar el ancla",
+      "c": "Regateo y determinación del MANN o ALEX",
+      "d": "Cierre del acuerdo",
+      "e": "Prenegociación"
+    },
+    "correcta": "e",
+    "explicacion": "La prenegociación es la fase II de la escuela colaborativa. Las otras cuatro son fases de la competitiva.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: fase I de la competitiva (también hay una Introducción en la colaborativa, por eso confunde).",
+      "b": "Incorrecta: fase II de la competitiva.",
+      "c": "Incorrecta: fase III de la competitiva.",
+      "d": "Incorrecta: fase V de la competitiva.",
+      "e": "Correcta (es la que NO es): fase de la colaborativa."
+    },
+    "fuente": "Parcial · Filmina C7 p.4-7",
+    "origen_parcial": "2º parcial 27/11/2025, Tema 3, P3",
+    "opciones_originales": false
+  },
+  {
+    "id": "U7-P16",
+    "unidad": 7,
+    "nivel": "parcial",
+    "pregunta": "Un negociador japonés busca negociar con una cultura de BAJO contexto. ¿Con qué país lo haría?",
+    "opciones": {
+      "a": "Brasil",
+      "b": "Finlandia",
+      "c": "Egipto",
+      "d": "Corea del Sur",
+      "e": "Uruguay"
+    },
+    "correcta": "b",
+    "explicacion": "Finlandia es nórdica (escandinava): bajo contexto. En el parcial no estaba marcada; sale por la lógica de la filmina, igual que Suecia en el recuperatorio.",
+    "justificacion_opciones": {
+      "a": "Incorrecta: latino, alto contexto.",
+      "b": "Correcta: nórdico, bajo contexto.",
+      "c": "Incorrecta: árabe y africano, alto contexto.",
+      "d": "Incorrecta: asiático, alto contexto.",
+      "e": "Incorrecta: latino, alto contexto."
+    },
+    "fuente": "Parcial · Filmina C7 p.14-15",
+    "origen_parcial": "2º parcial 27/11/2025, Tema 3, P9",
+    "opciones_originales": true
+  }
+]</script>
+
+<script>
+/* ============ DATOS ============
+   Las unidades se arman solas a partir del campo `unidad` de cada pregunta. */
+const UNITS = [];
+document.querySelectorAll("script.preguntas").forEach(el => {
+  JSON.parse(el.textContent).forEach(q => {
+    let u = UNITS.find(u => u.n === q.unidad);
+    if (!u) UNITS.push(u = { n:q.unidad, id:"u"+q.unidad, name:"Unidad "+q.unidad, questions:[] });
+    u.questions.push(q);
+  });
+});
+UNITS.sort((a,b) => a.n - b.n);
+
+/* ============ LÓGICA ============ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const ALL = "all";
+const LEVELS = [
+  ["sencillo",   "Fácil"],
+  ["intermedio", "Medio"],
+  ["dificil",    "Difícil"],
+  ["parcial",    "Parcial"]
+];
+const LEVEL_NAME = Object.fromEntries(LEVELS);
+
+let mode = "practice";        // "practice" | "exam"
+let unitSel = UNITS[0].id;    // id de unidad o ALL
+let levelSel = "sencillo";
+let state = {};               // por alcance: { answers:{id:letra}, finished:bool }
+
+/* ---- alcance actual ---- */
+function scopeKey(){ return mode === "exam" ? "exam" : unitSel + "|" + levelSel; }
+function ensure(){ const k = scopeKey(); if(!state[k]) state[k] = { answers:{}, finished:false }; return state[k]; }
+
+function itemsFor(unitId, level){
+  const out = [];
+  UNITS.filter(u => unitId === ALL || u.id === unitId).forEach(u =>
+    u.questions.forEach(q => { if (q.nivel === level) out.push({...q, unit:u.name}); }));
+  return out;
+}
+function items(){
+  return mode === "exam" ? itemsFor(ALL, "parcial") : itemsFor(unitSel, levelSel);
+}
+function count(unitId, level){ return itemsFor(unitId, level).length; }
+
+function scopeLabel(){
+  if (mode === "exam") return "Parcial completo · todas las unidades";
+  const u = unitSel === ALL ? "Todas las unidades" : UNITS.find(u => u.id === unitSel).name;
+  return u + " · " + LEVEL_NAME[levelSel];
+}
+
+/* ---- menú ---- */
+function renderMenu(){
+  const box = $("menu");
+  box.innerHTML = "";
+  box.className = "menu" + (mode === "exam" ? " locked" : "");
+
+  const row = (label, opts, active, pick) => {
+    const r = document.createElement("div");
+    r.className = "frow practice";
+    const s = document.createElement("span");
+    s.className = "flabel"; s.textContent = label;
+    r.appendChild(s);
+    opts.forEach(([id, name, n]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "fbtn" + (mode === "practice" && id === active ? " active" : "");
+      b.innerHTML = name + (n != null ? `<small>${n}</small>` : "");
+      b.onclick = () => { mode = "practice"; pick(id); renderMenu(); render(); window.scrollTo({top:0,behavior:"smooth"}); };
+      r.appendChild(b);
+    });
+    box.appendChild(r);
+  };
+
+  const unitOpts = UNITS.map(u => [u.id, u.name, null]);
+  if (UNITS.length > 1) unitOpts.push([ALL, "Todas", null]);
+  row("Unidad", unitOpts, unitSel, id => { unitSel = id; });
+  row("Nivel", LEVELS.map(([id, name]) => [id, name, count(unitSel, id)]), levelSel, id => { levelSel = id; });
+
+  const eb = document.createElement("button");
+  eb.type = "button";
+  eb.className = "exambtn" + (mode === "exam" ? " active" : "");
+  eb.textContent = `📝 Parcial completo — ${count(ALL, "parcial")} preguntas, todas las unidades, un solo intento`;
+  eb.onclick = () => { mode = "exam"; renderMenu(); render(); window.scrollTo({top:0,behavior:"smooth"}); };
+  box.appendChild(eb);
+}
+
+/* ---- tarjetas ---- */
+function render(){
+  const s = ensure(), list = $("list"), its = items(), n = its.length;
+  const exam = mode === "exam";
+  list.innerHTML = "";
+  $("result").className = "result";
+  $("finish").innerHTML = "";
+
+  if (!n){
+    list.innerHTML = '<div class="empty">Todavía no hay preguntas en esta sección.</div>';
+    updateStats(); return;
+  }
+
+  let lastBlock = null;
+  its.forEach((it, i) => {
+    if (exam && it.unit !== lastBlock){
+      lastBlock = it.unit;
+      const h = document.createElement("div");
+      h.className = "block-title"; h.textContent = it.unit;
+      list.appendChild(h);
+    }
+    const card = document.createElement("section");
+    card.className = "q";
+    const tag = exam ? `${it.unit} · Pregunta ${i+1} de ${n}` : `Pregunta ${i+1} de ${n} (${LEVEL_NAME[it.nivel]})`;
+    card.innerHTML = `<span class="tag">${tag}</span>${originBadge(it)}<h3>${i+1}. ${esc(it.pregunta)}</h3><div class="opts"></div>`;
+    const ob = card.querySelector(".opts");
+    Object.entries(it.opciones).forEach(([k, txt]) => {
+      const b = document.createElement("button");
+      b.className = "opt"; b.type = "button"; b.dataset.k = k;
+      b.innerHTML = `<span class="l">${k}</span><span class="txt">${esc(txt)}</span>`;
+      b.onclick = () => answer(it.id, k);
+      ob.appendChild(b);
+    });
+    list.appendChild(card);
+    const a = s.answers[it.id];
+    if (exam){
+      if (s.finished) paint(card, it, a);
+      else if (a !== undefined) card.querySelector(`.opt[data-k="${a}"]`).classList.add("sel");
+    } else if (a !== undefined) paint(card, it, a);
+  });
+  updateStats();
+}
+
+function originBadge(it){
+  if (!it.origen_parcial) return "";
+  const adaptadas = it.opciones_originales === false ? " · opciones adaptadas" : "";
+  return `<span class="exam">📌 ${esc(it.origen_parcial)}${adaptadas}</span>`;
+}
+
+function paint(card, it, choice){
+  card.querySelectorAll(".opt").forEach(b => {
+    const k = b.dataset.k;
+    b.disabled = true;
+    b.classList.remove("sel");
+    if (k === it.correcta) b.classList.add("correct");
+    else if (k === choice) b.classList.add("wrong");
+    else b.classList.add("dim");
+    const why = document.createElement("span");
+    why.className = "optwhy"; why.textContent = it.justificacion_opciones[k];
+    b.querySelector(".txt").appendChild(why);
+  });
+  const ok = choice === it.correcta;
+  const head = choice === undefined ? `⚪ Sin responder — la respuesta correcta es la ${it.correcta})`
+             : ok ? "✅ ¡Correcto!"
+             : `❌ Incorrecto — la respuesta correcta es la ${it.correcta})`;
+  const d = document.createElement("div");
+  d.className = "just" + (ok ? "" : " bad");
+  d.innerHTML = `<strong>${head}</strong>${esc(it.explicacion)}<span class="src">Fuente: ${esc(it.fuente)}</span>`;
+  card.appendChild(d);
+}
+
+function answer(id, k){
+  const s = ensure(), its = items(), i = its.findIndex(it => it.id === id);
+  if (i < 0 || s.finished) return;
+  const card = $("list").querySelectorAll(".q")[i];
+  if (mode === "exam"){
+    s.answers[id] = k;                          // en el parcial se puede cambiar hasta finalizar
+    card.querySelectorAll(".opt").forEach(b => b.classList.toggle("sel", b.dataset.k === k));
+  } else {
+    if (s.answers[id] !== undefined) return;
+    s.answers[id] = k;
+    paint(card, its[i], k);
+  }
+  updateStats();
+}
+
+function finishExam(){
+  const s = ensure(), its = items();
+  const pend = its.filter(it => s.answers[it.id] === undefined).length;
+  if (pend && !confirm(`Te quedan ${pend} sin responder. ¿Finalizar igual?`)) return;
+  s.finished = true;
+  render();
+  $("result").scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+function updateStats(){
+  const s = ensure(), its = items(), total = its.length;
+  const exam = mode === "exam";
+  let done = 0, right = 0;
+  its.forEach(it => {
+    const a = s.answers[it.id];
+    if (a !== undefined){ done++; if (a === it.correcta) right++; }
+  });
+  $("total").textContent = total;
+  $("answered").textContent = done;
+  $("right").textContent = exam && !s.finished ? "–" : right;
+  $("progress").style.width = total ? (done/total*100)+"%" : "0";
+  $("scope").textContent = `Mostrando ${total} pregunta${total===1?"":"s"} · ${scopeLabel()}`;
+
+  const r = $("result"), f = $("finish");
+  f.innerHTML = "";
+  r.className = "result";
+  if (!total) return;
+
+  if (exam && !s.finished){
+    const b = document.createElement("button");
+    b.className = "btn main"; b.type = "button";
+    b.textContent = `Finalizar parcial (${done}/${total} respondidas)`;
+    b.onclick = finishExam;
+    f.appendChild(b);
+    return;
+  }
+  if (exam ? s.finished : done === total){
+    const pct = Math.round(right/total*100);
+    r.innerHTML = `<h2>${pct >= 60 ? "🎉" : "💪"} Resultado: ${right}/${total} (${pct}%)</h2><p>${scopeLabel()} — ${pct>=60 ? "¡Buen trabajo!" : "Repasá las justificaciones e intentá de nuevo."}</p>`;
+    r.className = "result show";
+  }
+}
+
+$("reset").onclick = () => { delete state[scopeKey()]; render(); window.scrollTo({top:0,behavior:"smooth"}); };
+
+renderMenu(); render();
+</script>
+</body>
+</html>
